@@ -85,7 +85,7 @@ void App::Load(Platform::String^ entryPoint)
 {
 	if (m_main == nullptr)
 	{
-		m_main = std::unique_ptr<Main>(new Main(m_deviceResources));
+		m_main = std::unique_ptr<DirectX_CppCXMain>(new DirectX_CppCXMain(m_deviceResources));
 	}
 }
 

@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "Common\DeviceResources.h"
-#include "Main.h"
+#include "DirectX_CppCXMain.h"
 
 namespace DirectX_CppCX
 {
@@ -37,7 +37,7 @@ namespace DirectX_CppCX
 
 	private:
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
-		std::unique_ptr<Main> m_main;
+		std::unique_ptr<DirectX_CppCXMain> m_main;
 		bool m_windowClosed;
 		bool m_windowVisible;
 	};
