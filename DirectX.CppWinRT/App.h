@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "Common\DeviceResources.h"
-#include "DirectX_CppCXMain.h"
+#include "Main.h"
 
 namespace DirectX_CppCX
 {

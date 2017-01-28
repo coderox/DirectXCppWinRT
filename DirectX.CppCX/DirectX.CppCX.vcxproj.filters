@@ -23,11 +23,11 @@
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DirectX.CppCX_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Common">
       <UniqueIdentifier>{3c44d237-a96c-47d4-8406-ddb1bb9c0bd5}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\DirectX.TemporaryKey.pfx" />
   </ItemGroup>
 </Project>

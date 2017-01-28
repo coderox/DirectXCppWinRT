@@ -43,9 +43,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Common\StepTimer.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Content\Sample3DSceneRenderer.h">
       <Filter>Content</Filter>
     </ClInclude>
@@ -53,6 +50,9 @@
       <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Content\ShaderStructures.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Common\StepTimer.h">
       <Filter>Content</Filter>
     </ClInclude>
   </ItemGroup>
