@@ -6,13 +6,13 @@
 #include "Content\SampleFpsTextRenderer.h"
 
 // Renders Direct2D and 3D content on the screen.
-namespace DirectX_CppCX
+namespace DirectX_CppWinRT
 {
-	class DirectX_CppCXMain : public DX::IDeviceNotify
+	class DirectX_CppWinRTMain : public DX::IDeviceNotify
 	{
 	public:
-		DirectX_CppCXMain(const std::shared_ptr<DX::DeviceResources>& deviceResources);
-		~DirectX_CppCXMain();
+		DirectX_CppWinRTMain(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+		~DirectX_CppWinRTMain();
 		void CreateWindowSizeDependentResources();
 		void Update();
 		bool Render();

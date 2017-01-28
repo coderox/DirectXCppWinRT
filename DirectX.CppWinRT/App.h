@@ -4,7 +4,7 @@
 #include "Common\DeviceResources.h"
 #include "Main.h"
 
-namespace DirectX_CppCX
+namespace DirectX_CppWinRT
 {
 	// Main entry point for our app. Connects the app with the Windows shell and handles application lifecycle events.
 	ref class App sealed : public Windows::ApplicationModel::Core::IFrameworkView
@@ -37,7 +37,7 @@ namespace DirectX_CppCX
 
 	private:
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
-		std::unique_ptr<DirectX_CppCXMain> m_main;
+		std::unique_ptr<DirectX_CppWinRTMain> m_main;
 		bool m_windowClosed;
 		bool m_windowVisible;
 	};

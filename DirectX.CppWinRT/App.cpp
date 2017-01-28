@@ -3,7 +3,7 @@
 
 #include <ppltasks.h>
 
-using namespace DirectX_CppCX;
+using namespace DirectX_CppWinRT;
 
 using namespace concurrency;
 using namespace Windows::ApplicationModel;
@@ -85,7 +85,7 @@ void App::Load(Platform::String^ entryPoint)
 {
 	if (m_main == nullptr)
 	{
-		m_main = std::unique_ptr<DirectX_CppCXMain>(new DirectX_CppCXMain(m_deviceResources));
+		m_main = std::unique_ptr<DirectX_CppWinRTMain>(new DirectX_CppWinRTMain(m_deviceResources));
 	}
 }
 

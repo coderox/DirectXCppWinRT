@@ -30,7 +30,7 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="DirectX_CppCX.App">
+      EntryPoint="DirectX_CppWinRT.App">
       <uap:VisualElements
         DisplayName="DirectX.CppCX"
         Square150x150Logo="Assets\Square150x150Logo.png"
