@@ -4,9 +4,6 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{a8ea936c-f53f-4862-9d78-5293d40a9c98}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{9a38d4b7-86e4-4fdb-a26c-d79ea093c2e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Content">
       <UniqueIdentifier>{1e1a0792-5fc2-4774-b17d-21010211c089}</UniqueIdentifier>
     </Filter>
@@ -35,24 +32,15 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Content\Sample3DSceneRenderer.cpp">
-      <Filter>Content</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Content\SampleFpsTextRenderer.cpp">
       <Filter>Content</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Content\Sample3DSceneRenderer.h">
-      <Filter>Content</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Content\SampleFpsTextRenderer.h">
       <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Content\ShaderStructures.h">
-      <Filter>Content</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Common\StepTimer.h">
       <Filter>Content</Filter>
     </ClInclude>
   </ItemGroup>

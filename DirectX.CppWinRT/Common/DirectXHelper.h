@@ -1,6 +1,9 @@
 ﻿#pragma once
 
 #include <ppltasks.h>	// For create_task
+#include <future>
+
+
 
 namespace DX
 {
@@ -9,29 +12,30 @@ namespace DX
 		if (FAILED(hr))
 		{
 			// Set a breakpoint on this line to catch Win32 API errors.
-			throw Platform::Exception::CreateException(hr);
+			throw winrt::hresult_error(hr);
 		}
 	}
 
-	// Function that reads from a binary file asynchronously.
-	inline Concurrency::task<std::vector<byte>> ReadDataAsync(const std::wstring& filename)
-	{
-		using namespace Windows::Storage;
-		using namespace Concurrency;
-
-		auto folder = Windows::ApplicationModel::Package::Current->InstalledLocation;
-
-		return create_task(folder->GetFileAsync(Platform::StringReference(filename.c_str()))).then([] (StorageFile^ file) 
-		{
-			return FileIO::ReadBufferAsync(file);
-		}).then([] (Streams::IBuffer^ fileBuffer) -> std::vector<byte> 
-		{
-			std::vector<byte> returnBuffer;
-			returnBuffer.resize(fileBuffer->Length);
-			Streams::DataReader::FromBuffer(fileBuffer)->ReadBytes(Platform::ArrayReference<byte>(returnBuffer.data(), fileBuffer->Length));
-			return returnBuffer;
-		});
-	}
+// Function that reads from a binary file asynchronously.
+//inline Concurrency::task<std::vector<byte>> ReadDataAsync(const std::wstring& filename)
+//{
+//	using namespace winrt::Windows::Storage;
+//	using namespace Concurrency;
+//
+//	auto folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
+//	auto getFileTask = folder.GetFileAsync(filename);
+//
+//	return create_task(getFileTask)
+//		.then([](StorageFile const & file) {
+//		return FileIO::ReadBufferAsync(file);
+//	})
+//		.then([](Streams::IBuffer const & fileBuffer) -> std::vector<byte> {
+//		std::vector<byte> returnBuffer;
+//		returnBuffer.resize(fileBuffer.Length());
+//		Streams::DataReader::FromBuffer(fileBuffer).ReadBytes(winrt::array_ref<byte>(returnBuffer));
+//		return returnBuffer;
+//	});
+//}
 
 	// Converts a length in device-independent pixels (DIPs) to a length in physical pixels.
 	inline float ConvertDipsToPixels(float dips, float dpi)
@@ -55,7 +59,7 @@ namespace DX
 			nullptr,                    // No need to keep the D3D device reference.
 			nullptr,                    // No need to know the feature level.
 			nullptr                     // No need to keep the D3D device context reference.
-			);
+		);
 
 		return SUCCEEDED(hr);
 	}

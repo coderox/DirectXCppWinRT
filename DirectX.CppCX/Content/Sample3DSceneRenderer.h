@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "..\Common\DeviceResources.h"
-#include "ShaderStructures.h"
+#include "Content\ShaderStructures.h"
 #include "..\Common\StepTimer.h"
 
 namespace DirectX_Shared
@@ -39,7 +39,7 @@ namespace DirectX_Shared
 
 		// System resources for cube geometry.
 		ModelViewProjectionConstantBuffer	m_constantBufferData;
-		uint32	m_indexCount;
+		uint32_t	m_indexCount;
 
 		// Variables used with the rendering loop.
 		bool	m_loadingComplete;

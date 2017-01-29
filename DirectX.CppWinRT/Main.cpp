@@ -4,9 +4,6 @@
 
 using namespace DirectX_CppWinRT;
 using namespace DirectX_Shared;
-using namespace Windows::Foundation;
-using namespace Windows::System::Threading;
-using namespace Concurrency;
 
 // Loads and initializes application assets when the application is loaded.
 DirectX_CppWinRTMain::DirectX_CppWinRTMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :

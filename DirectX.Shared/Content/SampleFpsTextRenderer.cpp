@@ -47,7 +47,7 @@ SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceRes
 void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 {
 	// Update display text.
-	uint32 fps = timer.GetFramesPerSecond();
+	uint32_t fps = timer.GetFramesPerSecond();
 
 	m_text = (fps > 0) ? std::to_wstring(fps) + L" FPS" : L" - FPS";
 
@@ -55,7 +55,7 @@ void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 	DX::ThrowIfFailed(
 		m_deviceResources->GetDWriteFactory()->CreateTextLayout(
 			m_text.c_str(),
-			(uint32) m_text.length(),
+			(uint32_t) m_text.length(),
 			m_textFormat.Get(),
 			240.0f, // Max width of the input text.
 			50.0f, // Max height of the input text.
@@ -76,7 +76,7 @@ void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 void SampleFpsTextRenderer::Render()
 {
 	ID2D1DeviceContext* context = m_deviceResources->GetD2DDeviceContext();
-	Windows::Foundation::Size logicalSize = m_deviceResources->GetLogicalSize();
+	auto logicalSize = m_deviceResources->GetLogicalSize();
 
 	context->SaveDrawingState(m_stateBlock.Get());
 	context->BeginDraw();
