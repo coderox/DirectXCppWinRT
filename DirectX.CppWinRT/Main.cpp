@@ -6,7 +6,7 @@ using namespace DirectX_CppWinRT;
 using namespace DirectX_Shared;
 
 // Loads and initializes application assets when the application is loaded.
-DirectX_CppWinRTMain::DirectX_CppWinRTMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
+Main::Main(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_deviceResources(deviceResources)
 {
 	// Register to be notified if the Device is lost or recreated
@@ -25,21 +25,21 @@ DirectX_CppWinRTMain::DirectX_CppWinRTMain(const std::shared_ptr<DX::DeviceResou
 	*/
 }
 
-DirectX_CppWinRTMain::~DirectX_CppWinRTMain()
+Main::~Main()
 {
 	// Deregister device notification
 	m_deviceResources->RegisterDeviceNotify(nullptr);
 }
 
 // Updates application state when the window size changes (e.g. device orientation change)
-void DirectX_CppWinRTMain::CreateWindowSizeDependentResources() 
+void Main::CreateWindowSizeDependentResources()
 {
 	// TODO: Replace this with the size-dependent initialization of your app's content.
 	m_sceneRenderer->CreateWindowSizeDependentResources();
 }
 
 // Updates the application state once per frame.
-void DirectX_CppWinRTMain::Update() 
+void Main::Update()
 {
 	// Update scene objects.
 	m_timer.Tick([&]()
@@ -52,7 +52,7 @@ void DirectX_CppWinRTMain::Update()
 
 // Renders the current frame according to the current application state.
 // Returns true if the frame was rendered and is ready to be displayed.
-bool DirectX_CppWinRTMain::Render() 
+bool Main::Render()
 {
 	// Don't try to render anything before the first Update.
 	if (m_timer.GetFrameCount() == 0)
@@ -76,21 +76,21 @@ bool DirectX_CppWinRTMain::Render()
 
 	// Render the scene objects.
 	// TODO: Replace this with your app's content rendering functions.
-	m_sceneRenderer->Render();
+	//m_sceneRenderer->Render();
 	m_fpsTextRenderer->Render();
 
 	return true;
 }
 
 // Notifies renderers that device resources need to be released.
-void DirectX_CppWinRTMain::OnDeviceLost()
+void Main::OnDeviceLost()
 {
 	m_sceneRenderer->ReleaseDeviceDependentResources();
 	m_fpsTextRenderer->ReleaseDeviceDependentResources();
 }
 
 // Notifies renderers that device resources may now be recreated.
-void DirectX_CppWinRTMain::OnDeviceRestored()
+void Main::OnDeviceRestored()
 {
 	m_sceneRenderer->CreateDeviceDependentResources();
 	m_fpsTextRenderer->CreateDeviceDependentResources();

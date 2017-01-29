@@ -8,11 +8,11 @@
 // Renders Direct2D and 3D content on the screen.
 namespace DirectX_CppWinRT
 {
-	class DirectX_CppWinRTMain : public DX::IDeviceNotify
+	class Main : public DX::IDeviceNotify
 	{
 	public:
-		DirectX_CppWinRTMain(const std::shared_ptr<DX::DeviceResources>& deviceResources);
-		~DirectX_CppWinRTMain();
+		Main(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+		~Main();
 		void CreateWindowSizeDependentResources();
 		void Update();
 		bool Render();

@@ -20,7 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Common\DirectXHelper.h">
       <Filter>Common</Filter>
