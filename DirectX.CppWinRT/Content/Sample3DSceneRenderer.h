@@ -12,7 +12,7 @@ namespace DirectX_Shared
 	{
 	public:
 		Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
-		concurrency::task<void> CreateDeviceDependentResources();
+		concurrency::task<void> CreateDeviceDependentResourcesAsync();
 		void CreateWindowSizeDependentResources();
 		void ReleaseDeviceDependentResources();
 		void Update(DX::StepTimer const& timer);
@@ -24,6 +24,9 @@ namespace DirectX_Shared
 
 	private:
 		void Rotate(float radians);
+		void LoadVertexShader(const std::vector<byte>& fileData);
+		void LoadPixelShader(const std::vector<byte>& fileData);
+		void CreateCube();
 
 	private:
 		// Cached pointer to device resources.

@@ -15,7 +15,7 @@ Sample3DSceneRenderer::Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceRes
 	m_tracking(false),
 	m_deviceResources(deviceResources)
 {
-	CreateDeviceDependentResources();
+	CreateDeviceDependentResourcesAsync();
 	CreateWindowSizeDependentResources();
 }
 
@@ -179,25 +179,17 @@ void Sample3DSceneRenderer::Render()
 		);
 }
 
-concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResources()
-{
-	//winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Dispatcher().RunAsync(winrt::Windows::UI::Core::CoreDispatcherPriority::Normal, [this]() {
-	// Load shaders asynchronously.
-	auto vsFileData = co_await DX::ReadDataAsync(L"SampleVertexShader.cso");
-	auto psFileData = co_await DX::ReadDataAsync(L"SamplePixelShader.cso");
-
-	//// After the vertex shader file is loaded, create the shader and input layout.
-	//auto createVSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
+void Sample3DSceneRenderer::LoadVertexShader(const std::vector<byte>& fileData) {
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateVertexShader(
-			&vsFileData[0],
-			vsFileData.size(),
+			&fileData[0],
+			fileData.size(),
 			nullptr,
 			&m_vertexShader
-			)
-		);
+		)
+	);
 
-	static const D3D11_INPUT_ELEMENT_DESC vertexDesc [] =
+	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -207,48 +199,47 @@ concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_deviceResources->GetD3DDevice()->CreateInputLayout(
 			vertexDesc,
 			ARRAYSIZE(vertexDesc),
-			&vsFileData[0],
-			vsFileData.size(),
+			&fileData[0],
+			fileData.size(),
 			&m_inputLayout
-			)
-		);
+		)
+	);
+}
 
-	// After the pixel shader file is loaded, create the shader and constant buffer.
+void Sample3DSceneRenderer::LoadPixelShader(const std::vector<byte>& fileData) {
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreatePixelShader(
-			&psFileData[0],
-			psFileData.size(),
+			&fileData[0],
+			fileData.size(),
 			nullptr,
 			&m_pixelShader
-			)
-		);
+		)
+	);
 
-	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer) , D3D11_BIND_CONSTANT_BUFFER);
+	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer), D3D11_BIND_CONSTANT_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&constantBufferDesc,
 			nullptr,
 			&m_constantBuffer
-			)
-		);
+		)
+	);
+}
 
-	//// Once both shaders are loaded, create the mesh.
-	//auto createCubeTask = (createPSTask && createVSTask).then([this] () {
-
-	// Load mesh vertices. Each vertex has a position and a color.
-	static const VertexPositionColor cubeVertices[] = 
+void Sample3DSceneRenderer::CreateCube() {
+	static const VertexPositionColor cubeVertices[] =
 	{
-		{XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f)},
-		{XMFLOAT3(-0.5f, -0.5f,  0.5f), XMFLOAT3(0.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(-0.5f,  0.5f, -0.5f), XMFLOAT3(0.0f, 1.0f, 0.0f)},
-		{XMFLOAT3(-0.5f,  0.5f,  0.5f), XMFLOAT3(0.0f, 1.0f, 1.0f)},
-		{XMFLOAT3( 0.5f, -0.5f, -0.5f), XMFLOAT3(1.0f, 0.0f, 0.0f)},
-		{XMFLOAT3( 0.5f, -0.5f,  0.5f), XMFLOAT3(1.0f, 0.0f, 1.0f)},
-		{XMFLOAT3( 0.5f,  0.5f, -0.5f), XMFLOAT3(1.0f, 1.0f, 0.0f)},
-		{XMFLOAT3( 0.5f,  0.5f,  0.5f), XMFLOAT3(1.0f, 1.0f, 1.0f)},
+		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(-0.5f, -0.5f,  0.5f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f,  0.5f, -0.5f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(-0.5f,  0.5f,  0.5f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(0.5f, -0.5f,  0.5f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f,  0.5f, -0.5f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(0.5f,  0.5f,  0.5f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
 	};
 
-	D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
+	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
 	vertexBufferData.pSysMem = cubeVertices;
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
@@ -258,15 +249,15 @@ concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResources()
 			&vertexBufferDesc,
 			&vertexBufferData,
 			&m_vertexBuffer
-			)
-		);
+		)
+	);
 
 	// Load mesh indices. Each trio of indices represents
 	// a triangle to be rendered on the screen.
 	// For example: 0,2,1 means that the vertices with indexes
 	// 0, 2 and 1 from the vertex buffer compose the 
 	// first triangle of this mesh.
-	static const unsigned short cubeIndices [] =
+	static const unsigned short cubeIndices[] =
 	{
 		0,2,1, // -x
 		1,2,3,
@@ -289,7 +280,7 @@ concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 	m_indexCount = ARRAYSIZE(cubeIndices);
 
-	D3D11_SUBRESOURCE_DATA indexBufferData = {0};
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
 	indexBufferData.pSysMem = cubeIndices;
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;
@@ -299,13 +290,21 @@ concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResources()
 			&indexBufferDesc,
 			&indexBufferData,
 			&m_indexBuffer
-			)
-		);
+		)
+	);
+}
 
-	//// Once the cube is loaded, the object is ready to be rendered.
-	//createCubeTask.then([this] () {
+concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResourcesAsync()
+{
+	// Load shaders asynchronously.
+	auto vsFileData = co_await DX::ReadDataAsync(L"SampleVertexShader.cso");
+	auto psFileData = co_await DX::ReadDataAsync(L"SamplePixelShader.cso");
+
+	LoadVertexShader(vsFileData);
+	LoadPixelShader(psFileData);
+	CreateCube();
+	
 	m_loadingComplete = true;
-	//});
 }
 
 void Sample3DSceneRenderer::ReleaseDeviceDependentResources()

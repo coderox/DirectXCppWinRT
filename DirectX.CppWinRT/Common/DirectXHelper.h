@@ -34,27 +34,6 @@ namespace DX
 		}
 	}
 
-// Function that reads from a binary file asynchronously.
-//inline Concurrency::task<std::vector<byte>> ReadDataAsync(const std::wstring& filename)
-//{
-//	using namespace winrt::Windows::Storage;
-//	using namespace Concurrency;
-//
-//	auto folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
-//	auto getFileTask = folder.GetFileAsync(filename);
-//
-//	return create_task(getFileTask)
-//		.then([](StorageFile const & file) {
-//		return FileIO::ReadBufferAsync(file);
-//	})
-//		.then([](Streams::IBuffer const & fileBuffer) -> std::vector<byte> {
-//		std::vector<byte> returnBuffer;
-//		returnBuffer.resize(fileBuffer.Length());
-//		Streams::DataReader::FromBuffer(fileBuffer).ReadBytes(winrt::array_ref<byte>(returnBuffer));
-//		return returnBuffer;
-//	});
-//}
-
 	// Converts a length in device-independent pixels (DIPs) to a length in physical pixels.
 	inline float ConvertDipsToPixels(float dips, float dpi)
 	{
