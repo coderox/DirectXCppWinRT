@@ -8,6 +8,7 @@
 #include "winrt/Windows.UI.Composition.h"
 #include "winrt/Windows.UI.Xaml.Controls.h"
 #include "winrt/Windows.Graphics.Display.h"
+#include "winrt/Windows.Storage.Streams.h"
 
 #include <wrl.h>
 #include <wrl/client.h>

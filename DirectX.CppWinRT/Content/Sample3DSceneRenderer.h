@@ -3,6 +3,7 @@
 #include "..\Common\DeviceResources.h"
 #include "Content\ShaderStructures.h"
 #include "..\Common\StepTimer.h"
+#include <pplawait.h>
 
 namespace DirectX_Shared
 {
@@ -11,7 +12,7 @@ namespace DirectX_Shared
 	{
 	public:
 		Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
-		void CreateDeviceDependentResources();
+		concurrency::task<void> CreateDeviceDependentResources();
 		void CreateWindowSizeDependentResources();
 		void ReleaseDeviceDependentResources();
 		void Update(DX::StepTimer const& timer);
@@ -20,7 +21,6 @@ namespace DirectX_Shared
 		void TrackingUpdate(float positionX);
 		void StopTracking();
 		bool IsTracking() { return m_tracking; }
-
 
 	private:
 		void Rotate(float radians);

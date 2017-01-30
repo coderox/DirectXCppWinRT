@@ -3,7 +3,9 @@
 #include <ppltasks.h>	// For create_task
 #include <future>
 
-
+using namespace winrt::Windows::Foundation;
+using namespace winrt::Windows::Storage;
+using namespace winrt::Windows::Storage::Streams;
 
 namespace DX
 {
@@ -13,6 +15,22 @@ namespace DX
 		{
 			// Set a breakpoint on this line to catch Win32 API errors.
 			throw winrt::hresult_error(hr);
+		}
+	}
+
+	inline std::future<std::vector<byte>> ReadDataAsync(const std::wstring& filename)
+	{
+		try {
+			auto folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
+			auto file = co_await folder.GetFileAsync(winrt::hstring_ref(filename.c_str()));
+			IBuffer fileBuffer = co_await FileIO::ReadBufferAsync(file);
+			std::vector<byte> returnBuffer;
+			returnBuffer.resize(fileBuffer.Length());
+			DataReader::FromBuffer(fileBuffer).ReadBytes(winrt::array_ref<byte>(returnBuffer));
+			return returnBuffer;
+		}
+		catch (...) {
+
 		}
 	}
 
