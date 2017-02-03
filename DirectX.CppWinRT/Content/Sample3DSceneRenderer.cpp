@@ -139,18 +139,18 @@ void Sample3DSceneRenderer::Render()
 		);
 
 	context->IASetIndexBuffer(
-		m_indexBuffer.Get(),
+		winrt::get(m_indexBuffer),
 		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
 		0
 		);
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	context->IASetInputLayout(m_inputLayout.Get());
+	context->IASetInputLayout(winrt::get(m_inputLayout));
 
 	// Attach our vertex shader.
 	context->VSSetShader(
-		m_vertexShader.Get(),
+		winrt::get(m_vertexShader),
 		nullptr,
 		0
 		);
@@ -166,7 +166,7 @@ void Sample3DSceneRenderer::Render()
 
 	// Attach our pixel shader.
 	context->PSSetShader(
-		m_pixelShader.Get(),
+		winrt::get(m_pixelShader),
 		nullptr,
 		0
 		);
@@ -185,7 +185,7 @@ void Sample3DSceneRenderer::LoadVertexShader(const std::vector<byte>& fileData) 
 			&fileData[0],
 			fileData.size(),
 			nullptr,
-			&m_vertexShader
+			winrt::put(m_vertexShader)
 		)
 	);
 
@@ -201,7 +201,7 @@ void Sample3DSceneRenderer::LoadVertexShader(const std::vector<byte>& fileData) 
 			ARRAYSIZE(vertexDesc),
 			&fileData[0],
 			fileData.size(),
-			&m_inputLayout
+			winrt::put(m_inputLayout)
 		)
 	);
 }
@@ -212,7 +212,7 @@ void Sample3DSceneRenderer::LoadPixelShader(const std::vector<byte>& fileData) {
 			&fileData[0],
 			fileData.size(),
 			nullptr,
-			&m_pixelShader
+			winrt::put(m_pixelShader)
 		)
 	);
 
@@ -289,7 +289,7 @@ void Sample3DSceneRenderer::CreateCube() {
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&indexBufferDesc,
 			&indexBufferData,
-			&m_indexBuffer
+			winrt::put(m_indexBuffer)
 		)
 	);
 }
@@ -310,10 +310,10 @@ concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResourcesAsy
 void Sample3DSceneRenderer::ReleaseDeviceDependentResources()
 {
 	m_loadingComplete = false;
-	m_vertexShader.Reset();
-	m_inputLayout.Reset();
-	m_pixelShader.Reset();
+	m_vertexShader = nullptr;
+	m_inputLayout = nullptr;
+	m_pixelShader = nullptr;
 	m_constantBuffer.Reset();
 	m_vertexBuffer.Reset();
-	m_indexBuffer.Reset();
+	m_indexBuffer = nullptr;
 }
