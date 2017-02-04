@@ -33,8 +33,8 @@ namespace DirectX_Shared
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
 
 		// Direct3D resources for cube geometry.
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_vertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_constantBuffer;
+		winrt::com_ptr<ID3D11Buffer>		m_vertexBuffer;
+		winrt::com_ptr<ID3D11Buffer>		m_constantBuffer;
 		winrt::com_ptr<ID3D11Buffer>		m_indexBuffer;
 		winrt::com_ptr<ID3D11InputLayout>	m_inputLayout;
 		winrt::com_ptr<ID3D11VertexShader>	m_vertexShader;

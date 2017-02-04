@@ -118,7 +118,7 @@ void Sample3DSceneRenderer::Render()
 
 	// Prepare the constant buffer to send it to the graphics device.
 	context->UpdateSubresource1(
-		m_constantBuffer.Get(),
+		winrt::get(m_constantBuffer),
 		0,
 		NULL,
 		&m_constantBufferData,
@@ -130,10 +130,11 @@ void Sample3DSceneRenderer::Render()
 	// Each vertex is one instance of the VertexPositionColor struct.
 	UINT stride = sizeof(VertexPositionColor);
 	UINT offset = 0;
+	ID3D11Buffer* const vertexBuffers[] = { get(m_vertexBuffer) };
 	context->IASetVertexBuffers(
 		0,
 		1,
-		m_vertexBuffer.GetAddressOf(),
+		vertexBuffers,
 		&stride,
 		&offset
 		);
@@ -156,10 +157,11 @@ void Sample3DSceneRenderer::Render()
 		);
 
 	// Send the constant buffer to the graphics device.
+	ID3D11Buffer* const constantBuffers[] = { get(m_constantBuffer) };
 	context->VSSetConstantBuffers1(
 		0,
 		1,
-		m_constantBuffer.GetAddressOf(),
+		constantBuffers,
 		nullptr,
 		nullptr
 		);
@@ -221,7 +223,7 @@ void Sample3DSceneRenderer::LoadPixelShader(const std::vector<byte>& fileData) {
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&constantBufferDesc,
 			nullptr,
-			&m_constantBuffer
+			winrt::put(m_constantBuffer)
 		)
 	);
 }
@@ -244,11 +246,12 @@ void Sample3DSceneRenderer::CreateCube() {
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
 	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(cubeVertices), D3D11_BIND_VERTEX_BUFFER);
+	
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&vertexBufferDesc,
 			&vertexBufferData,
-			&m_vertexBuffer
+			winrt::put(m_vertexBuffer)
 		)
 	);
 
@@ -313,7 +316,7 @@ void Sample3DSceneRenderer::ReleaseDeviceDependentResources()
 	m_vertexShader = nullptr;
 	m_inputLayout = nullptr;
 	m_pixelShader = nullptr;
-	m_constantBuffer.Reset();
-	m_vertexBuffer.Reset();
+	m_constantBuffer = nullptr;
+	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
 }
