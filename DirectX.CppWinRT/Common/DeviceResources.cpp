@@ -10,6 +10,7 @@ using namespace winrt::Windows::Graphics::Display;
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::UI::Xaml::Controls;
 using namespace winrt;
+using namespace DX;
 
 namespace DisplayMetrics
 {
@@ -99,7 +100,7 @@ void DX::DeviceResources::CreateDeviceIndependentResources()
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory3),
 			&options,
-			&m_d2dFactory
+			(void**)winrt::put(m_d2dFactory)
 		)
 	);
 
@@ -108,7 +109,7 @@ void DX::DeviceResources::CreateDeviceIndependentResources()
 		DWriteCreateFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory3),
-			&m_dwriteFactory
+			(IUnknown**)winrt::put(m_dwriteFactory)
 		)
 	);
 
@@ -118,7 +119,7 @@ void DX::DeviceResources::CreateDeviceIndependentResources()
 			CLSID_WICImagingFactory2,
 			nullptr,
 			CLSCTX_INPROC_SERVER,
-			IID_PPV_ARGS(&m_wicFactory)
+			IID_PPV_ARGS(winrt::put(m_wicFactory))
 		)
 	);
 }
@@ -156,8 +157,8 @@ void DX::DeviceResources::CreateDeviceResources()
 	};
 
 	// Create the Direct3D 11 API device object and a corresponding context.
-	ComPtr<ID3D11Device> device;
-	ComPtr<ID3D11DeviceContext> context;
+	winrt::com_ptr<ID3D11Device> device;
+	winrt::com_ptr<ID3D11DeviceContext> context;
 
 	HRESULT hr = D3D11CreateDevice(
 		nullptr,					// Specify nullptr to use the default adapter.
@@ -167,9 +168,9 @@ void DX::DeviceResources::CreateDeviceResources()
 		featureLevels,				// List of feature levels this app can support.
 		ARRAYSIZE(featureLevels),	// Size of the list above.
 		D3D11_SDK_VERSION,			// Always set this to D3D11_SDK_VERSION for Windows Store apps.
-		&device,					// Returns the Direct3D device created.
+		winrt::put(device),			// Returns the Direct3D device created.
 		&m_d3dFeatureLevel,			// Returns feature level of device created.
-		&context					// Returns the device immediate context.
+		winrt::put(context) 		// Returns the device immediate context.
 	);
 
 	if (FAILED(hr))
@@ -186,36 +187,30 @@ void DX::DeviceResources::CreateDeviceResources()
 				featureLevels,
 				ARRAYSIZE(featureLevels),
 				D3D11_SDK_VERSION,
-				&device,
+				winrt::put(device),
 				&m_d3dFeatureLevel,
-				&context
+				winrt::put(context)
 			)
 		);
 	}
 
 	// Store pointers to the Direct3D 11.3 API device and immediate context.
-	DX::ThrowIfFailed(
-		device.As(&m_d3dDevice)
-	);
+	DX::As(device, m_d3dDevice);
 
-	DX::ThrowIfFailed(
-		context.As(&m_d3dContext)
-	);
+	DX::As(context, m_d3dContext);
 
 	// Create the Direct2D device object and a corresponding context.
-	ComPtr<IDXGIDevice3> dxgiDevice;
+	winrt::com_ptr<IDXGIDevice3> dxgiDevice;	
+	DX::As(m_d3dDevice, dxgiDevice);
+	
 	DX::ThrowIfFailed(
-		m_d3dDevice.As(&dxgiDevice)
-	);
-
-	DX::ThrowIfFailed(
-		m_d2dFactory->CreateDevice(dxgiDevice.Get(), &m_d2dDevice)
+		m_d2dFactory->CreateDevice(winrt::get(dxgiDevice), winrt::put(m_d2dDevice))
 	);
 
 	DX::ThrowIfFailed(
 		m_d2dDevice->CreateDeviceContext(
 			D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
-			&m_d2dContext
+			winrt::put(m_d2dContext)
 		)
 	);
 }
@@ -243,7 +238,7 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 	m_d3dRenderTargetSize.Width = swapDimensions ? m_outputSize.Height : m_outputSize.Width;
 	m_d3dRenderTargetSize.Height = swapDimensions ? m_outputSize.Width : m_outputSize.Height;
 
-	if (m_swapChain != nullptr)
+	if (winrt::get(m_swapChain) != nullptr)
 	{
 		// If the swap chain already exists, resize it.
 		HRESULT hr = m_swapChain->ResizeBuffers(
@@ -288,34 +283,30 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
 		// This sequence obtains the DXGI factory that was used to create the Direct3D device above.
-		ComPtr<IDXGIDevice3> dxgiDevice;
+		winrt::com_ptr<IDXGIDevice3> dxgiDevice;
+		DX::As(m_d3dDevice, dxgiDevice);
+
+		winrt::com_ptr<IDXGIAdapter> dxgiAdapter;
 		DX::ThrowIfFailed(
-			m_d3dDevice.As(&dxgiDevice)
+			dxgiDevice->GetAdapter(winrt::put(dxgiAdapter))
 		);
 
-		ComPtr<IDXGIAdapter> dxgiAdapter;
+		winrt::com_ptr<IDXGIFactory4> dxgiFactory;
 		DX::ThrowIfFailed(
-			dxgiDevice->GetAdapter(&dxgiAdapter)
+			dxgiAdapter->GetParent(IID_PPV_ARGS(winrt::put(dxgiFactory)))
 		);
 
-		ComPtr<IDXGIFactory4> dxgiFactory;
-		DX::ThrowIfFailed(
-			dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory))
-		);
-
-		ComPtr<IDXGISwapChain1> swapChain;
+		winrt::com_ptr<IDXGISwapChain1> swapChain;
 		DX::ThrowIfFailed(
 			dxgiFactory->CreateSwapChainForCoreWindow(
-				m_d3dDevice.Get(),
+				winrt::get(m_d3dDevice),
 				reinterpret_cast<IUnknown*>(winrt::get(m_window.get())),
 				&swapChainDesc,
 				nullptr,
-				&swapChain
+				winrt::put(swapChain)
 			)
 		);
-		DX::ThrowIfFailed(
-			swapChain.As(&m_swapChain)
-		);
+		DX::As(swapChain, m_swapChain);
 
 		// Ensure that DXGI does not queue more than one frame at a time. This both reduces latency and
 		// ensures that the application will only render after each VSync, minimizing power consumption.
@@ -367,16 +358,16 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 	);
 
 	// Create a render target view of the swap chain back buffer.
-	ComPtr<ID3D11Texture2D1> backBuffer;
+	winrt::com_ptr<ID3D11Texture2D1> backBuffer;
 	DX::ThrowIfFailed(
-		m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))
+		m_swapChain->GetBuffer(0, IID_PPV_ARGS(winrt::put(backBuffer)))
 	);
 
 	DX::ThrowIfFailed(
 		m_d3dDevice->CreateRenderTargetView1(
-			backBuffer.Get(),
+			winrt::get(backBuffer),
 			nullptr,
-			&m_d3dRenderTargetView
+			winrt::put(m_d3dRenderTargetView)
 		)
 	);
 
@@ -390,21 +381,21 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 		D3D11_BIND_DEPTH_STENCIL
 	);
 
-	ComPtr<ID3D11Texture2D1> depthStencil;
+	winrt::com_ptr<ID3D11Texture2D1> depthStencil;
 	DX::ThrowIfFailed(
 		m_d3dDevice->CreateTexture2D1(
 			&depthStencilDesc,
 			nullptr,
-			&depthStencil
+			winrt::put(depthStencil)
 		)
 	);
 
 	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
 	DX::ThrowIfFailed(
 		m_d3dDevice->CreateDepthStencilView(
-			depthStencil.Get(),
+			winrt::get(depthStencil),
 			&depthStencilViewDesc,
-			&m_d3dDepthStencilView
+			winrt::put(m_d3dDepthStencilView)
 		)
 	);
 
@@ -428,20 +419,20 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 			m_dpi
 		);
 
-	ComPtr<IDXGISurface2> dxgiBackBuffer;
+	winrt::com_ptr<IDXGISurface2> dxgiBackBuffer;
 	DX::ThrowIfFailed(
-		m_swapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer))
+		m_swapChain->GetBuffer(0, IID_PPV_ARGS(winrt::put(dxgiBackBuffer)))
 	);
 
 	DX::ThrowIfFailed(
 		m_d2dContext->CreateBitmapFromDxgiSurface(
-			dxgiBackBuffer.Get(),
+			winrt::get(dxgiBackBuffer),
 			&bitmapProperties,
-			&m_d2dTargetBitmap
+			winrt::put(m_d2dTargetBitmap)
 		)
 	);
 
-	m_d2dContext->SetTarget(m_d2dTargetBitmap.Get());
+	m_d2dContext->SetTarget(winrt::get(m_d2dTargetBitmap));
 	m_d2dContext->SetDpi(m_effectiveDpi, m_effectiveDpi);
 
 	// Grayscale text anti-aliasing is recommended for all Windows Store apps.
@@ -537,28 +528,28 @@ void DX::DeviceResources::ValidateDevice()
 
 	// First, get the information for the default adapter from when the device was created.
 
-	ComPtr<IDXGIDevice3> dxgiDevice;
-	DX::ThrowIfFailed(m_d3dDevice.As(&dxgiDevice));
+	winrt::com_ptr<IDXGIDevice3> dxgiDevice;
+	DX::As(m_d3dDevice,dxgiDevice);
 
-	ComPtr<IDXGIAdapter> deviceAdapter;
-	DX::ThrowIfFailed(dxgiDevice->GetAdapter(&deviceAdapter));
+	winrt::com_ptr<IDXGIAdapter> deviceAdapter;
+	DX::ThrowIfFailed(dxgiDevice->GetAdapter(winrt::put(deviceAdapter)));
 
-	ComPtr<IDXGIFactory4> deviceFactory;
-	DX::ThrowIfFailed(deviceAdapter->GetParent(IID_PPV_ARGS(&deviceFactory)));
+	winrt::com_ptr<IDXGIFactory4> deviceFactory;
+	DX::ThrowIfFailed(deviceAdapter->GetParent(IID_PPV_ARGS(winrt::put(deviceFactory))));
 
-	ComPtr<IDXGIAdapter1> previousDefaultAdapter;
-	DX::ThrowIfFailed(deviceFactory->EnumAdapters1(0, &previousDefaultAdapter));
+	winrt::com_ptr<IDXGIAdapter1> previousDefaultAdapter;
+	DX::ThrowIfFailed(deviceFactory->EnumAdapters1(0, winrt::put(previousDefaultAdapter)));
 
 	DXGI_ADAPTER_DESC1 previousDesc;
 	DX::ThrowIfFailed(previousDefaultAdapter->GetDesc1(&previousDesc));
 
 	// Next, get the information for the current default adapter.
 
-	ComPtr<IDXGIFactory4> currentFactory;
-	DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&currentFactory)));
+	winrt::com_ptr<IDXGIFactory4> currentFactory;
+	DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(winrt::put(currentFactory))));
 
-	ComPtr<IDXGIAdapter1> currentDefaultAdapter;
-	DX::ThrowIfFailed(currentFactory->EnumAdapters1(0, &currentDefaultAdapter));
+	winrt::com_ptr<IDXGIAdapter1> currentDefaultAdapter;
+	DX::ThrowIfFailed(currentFactory->EnumAdapters1(0, winrt::put(currentDefaultAdapter)));
 
 	DXGI_ADAPTER_DESC1 currentDesc;
 	DX::ThrowIfFailed(currentDefaultAdapter->GetDesc1(&currentDesc));
@@ -611,8 +602,8 @@ void DX::DeviceResources::RegisterDeviceNotify(DX::IDeviceNotify* deviceNotify)
 // is entering an idle state and that temporary buffers can be reclaimed for use by other apps.
 void DX::DeviceResources::Trim()
 {
-	ComPtr<IDXGIDevice3> dxgiDevice;
-	m_d3dDevice.As(&dxgiDevice);
+	winrt::com_ptr<IDXGIDevice3> dxgiDevice;
+	DX::As(m_d3dDevice,dxgiDevice);
 
 	dxgiDevice->Trim();
 }
@@ -629,10 +620,10 @@ void DX::DeviceResources::Present()
 	// Discard the contents of the render target.
 	// This is a valid operation only when the existing contents will be entirely
 	// overwritten. If dirty or scroll rects are used, this call should be removed.
-	m_d3dContext->DiscardView1(m_d3dRenderTargetView.Get(), nullptr, 0);
+	m_d3dContext->DiscardView1(winrt::get(m_d3dRenderTargetView), nullptr, 0);
 
 	// Discard the contents of the depth stencil.
-	m_d3dContext->DiscardView1(m_d3dDepthStencilView.Get(), nullptr, 0);
+	m_d3dContext->DiscardView1(winrt::get(m_d3dDepthStencilView), nullptr, 0);
 
 	// If the device was removed either by a disconnection or a driver upgrade, we 
 	// must recreate all device resources.

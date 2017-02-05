@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "pch.h"
 
 namespace DX
 {
@@ -32,22 +33,22 @@ namespace DX
 		float						GetDpi() const { return m_effectiveDpi; }
 
 		// D3D Accessors.
-		ID3D11Device3*				GetD3DDevice() const { return m_d3dDevice.Get(); }
-		ID3D11DeviceContext3*		GetD3DDeviceContext() const { return m_d3dContext.Get(); }
-		IDXGISwapChain3*			GetSwapChain() const { return m_swapChain.Get(); }
+		ID3D11Device3*				GetD3DDevice() const { return winrt::get(m_d3dDevice); }
+		ID3D11DeviceContext3*		GetD3DDeviceContext() const { return winrt::get(m_d3dContext); }
+		IDXGISwapChain3*			GetSwapChain() const { return winrt::get(m_swapChain); }
 		D3D_FEATURE_LEVEL			GetDeviceFeatureLevel() const { return m_d3dFeatureLevel; }
-		ID3D11RenderTargetView1*	GetBackBufferRenderTargetView() const { return m_d3dRenderTargetView.Get(); }
-		ID3D11DepthStencilView*		GetDepthStencilView() const { return m_d3dDepthStencilView.Get(); }
+		ID3D11RenderTargetView1*	GetBackBufferRenderTargetView() const { return winrt::get(m_d3dRenderTargetView); }
+		ID3D11DepthStencilView*		GetDepthStencilView() const { return winrt::get(m_d3dDepthStencilView); }
 		D3D11_VIEWPORT				GetScreenViewport() const { return m_screenViewport; }
 		DirectX::XMFLOAT4X4			GetOrientationTransform3D() const { return m_orientationTransform3D; }
 
 		// D2D Accessors.
-		ID2D1Factory3*				GetD2DFactory() const { return m_d2dFactory.Get(); }
-		ID2D1Device2*				GetD2DDevice() const { return m_d2dDevice.Get(); }
-		ID2D1DeviceContext2*		GetD2DDeviceContext() const { return m_d2dContext.Get(); }
-		ID2D1Bitmap1*				GetD2DTargetBitmap() const { return m_d2dTargetBitmap.Get(); }
-		IDWriteFactory3*			GetDWriteFactory() const { return m_dwriteFactory.Get(); }
-		IWICImagingFactory2*		GetWicImagingFactory() const { return m_wicFactory.Get(); }
+		ID2D1Factory3*				GetD2DFactory() const { return winrt::get(m_d2dFactory); }
+		ID2D1Device2*				GetD2DDevice() const { return winrt::get(m_d2dDevice); }
+		ID2D1DeviceContext2*		GetD2DDeviceContext() const { return winrt::get(m_d2dContext); }
+		ID2D1Bitmap1*				GetD2DTargetBitmap() const { return winrt::get(m_d2dTargetBitmap); }
+		IDWriteFactory3*			GetDWriteFactory() const { return winrt::get(m_dwriteFactory); }
+		IWICImagingFactory2*		GetWicImagingFactory() const { return winrt::get(m_wicFactory); }
 		D2D1::Matrix3x2F			GetOrientationTransform2D() const { return m_orientationTransform2D; }
 
 	private:
@@ -58,24 +59,24 @@ namespace DX
 		DXGI_MODE_ROTATION ComputeDisplayRotation();
 
 		// Direct3D objects.
-		Microsoft::WRL::ComPtr<ID3D11Device3>			m_d3dDevice;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext3>	m_d3dContext;
-		Microsoft::WRL::ComPtr<IDXGISwapChain3>			m_swapChain;
+		winrt::com_ptr<ID3D11Device3>			m_d3dDevice;
+		winrt::com_ptr<ID3D11DeviceContext3>	m_d3dContext;
+		winrt::com_ptr<IDXGISwapChain3>			m_swapChain;
 
 		// Direct3D rendering objects. Required for 3D.
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1>	m_d3dRenderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	m_d3dDepthStencilView;
-		D3D11_VIEWPORT									m_screenViewport;
+		winrt::com_ptr<ID3D11RenderTargetView1>	m_d3dRenderTargetView;
+		winrt::com_ptr<ID3D11DepthStencilView>	m_d3dDepthStencilView;
+		D3D11_VIEWPORT							m_screenViewport;
 
 		// Direct2D drawing components.
-		Microsoft::WRL::ComPtr<ID2D1Factory3>		m_d2dFactory;
-		Microsoft::WRL::ComPtr<ID2D1Device2>		m_d2dDevice;
-		Microsoft::WRL::ComPtr<ID2D1DeviceContext2>	m_d2dContext;
-		Microsoft::WRL::ComPtr<ID2D1Bitmap1>		m_d2dTargetBitmap;
+		winrt::com_ptr<ID2D1Factory3>		m_d2dFactory;
+		winrt::com_ptr<ID2D1Device2>		m_d2dDevice;
+		winrt::com_ptr<ID2D1DeviceContext2>	m_d2dContext;
+		winrt::com_ptr<ID2D1Bitmap1>		m_d2dTargetBitmap;
 
 		// DirectWrite drawing components.
-		Microsoft::WRL::ComPtr<IDWriteFactory3>		m_dwriteFactory;
-		Microsoft::WRL::ComPtr<IWICImagingFactory2>	m_wicFactory;
+		winrt::com_ptr<IDWriteFactory3>		m_dwriteFactory;
+		winrt::com_ptr<IWICImagingFactory2>	m_wicFactory;
 
 		// Cached reference to the Window.
 		winrt::agile_ref<winrt::Windows::UI::Core::CoreWindow> m_window;

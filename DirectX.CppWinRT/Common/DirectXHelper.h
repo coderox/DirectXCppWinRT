@@ -2,6 +2,7 @@
 
 #include <ppltasks.h>	// For create_task
 #include <future>
+#include "pch.h"
 
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Storage;
@@ -9,6 +10,12 @@ using namespace winrt::Windows::Storage::Streams;
 
 namespace DX
 {
+	template <typename From, typename To>
+	void As(From const & from, winrt::com_ptr<To> & to)
+	{
+		to = from.as<To>();
+	}
+
 	inline void ThrowIfFailed(HRESULT hr)
 	{
 		if (FAILED(hr))

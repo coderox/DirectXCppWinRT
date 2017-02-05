@@ -15,10 +15,6 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Content\SampleFpsTextRenderer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Content\SampleFpsTextRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Content\ShaderStructures.h" />
   </ItemGroup>
   <ItemGroup>

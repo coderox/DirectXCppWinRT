@@ -32,14 +32,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Content\SampleFpsTextRenderer.cpp">
-      <Filter>Content</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Content\SampleFpsTextRenderer.h">
-      <Filter>Content</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Content\ShaderStructures.h">
       <Filter>Content</Filter>
     </ClInclude>
