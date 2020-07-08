@@ -1,5 +1,5 @@
 # DirectXCppWinRT
 
-Clone with the following command to also clone submodule cppwinrt
+Clone with the following command
 
-git clone --recursive git://github.com/coderox/DirectXCppWinRT.git
+git clone git://github.com/coderox/DirectXCppWinRT.git
