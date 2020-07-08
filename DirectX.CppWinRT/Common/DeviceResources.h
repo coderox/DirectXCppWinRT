@@ -33,22 +33,22 @@ namespace DX
 		float						GetDpi() const { return m_effectiveDpi; }
 
 		// D3D Accessors.
-		ID3D11Device3*				GetD3DDevice() const { return winrt::get(m_d3dDevice); }
-		ID3D11DeviceContext3*		GetD3DDeviceContext() const { return winrt::get(m_d3dContext); }
-		IDXGISwapChain3*			GetSwapChain() const { return winrt::get(m_swapChain); }
+		ID3D11Device3*				GetD3DDevice() const { return m_d3dDevice.get(); }
+		ID3D11DeviceContext3*		GetD3DDeviceContext() const { return m_d3dContext.get(); }
+		IDXGISwapChain3*			GetSwapChain() const { return m_swapChain.get(); }
 		D3D_FEATURE_LEVEL			GetDeviceFeatureLevel() const { return m_d3dFeatureLevel; }
-		ID3D11RenderTargetView1*	GetBackBufferRenderTargetView() const { return winrt::get(m_d3dRenderTargetView); }
-		ID3D11DepthStencilView*		GetDepthStencilView() const { return winrt::get(m_d3dDepthStencilView); }
+		ID3D11RenderTargetView1*	GetBackBufferRenderTargetView() const { return m_d3dRenderTargetView.get(); }
+		ID3D11DepthStencilView*		GetDepthStencilView() const { return m_d3dDepthStencilView.get(); }
 		D3D11_VIEWPORT				GetScreenViewport() const { return m_screenViewport; }
 		DirectX::XMFLOAT4X4			GetOrientationTransform3D() const { return m_orientationTransform3D; }
 
 		// D2D Accessors.
-		ID2D1Factory3*				GetD2DFactory() const { return winrt::get(m_d2dFactory); }
-		ID2D1Device2*				GetD2DDevice() const { return winrt::get(m_d2dDevice); }
-		ID2D1DeviceContext2*		GetD2DDeviceContext() const { return winrt::get(m_d2dContext); }
-		ID2D1Bitmap1*				GetD2DTargetBitmap() const { return winrt::get(m_d2dTargetBitmap); }
-		IDWriteFactory3*			GetDWriteFactory() const { return winrt::get(m_dwriteFactory); }
-		IWICImagingFactory2*		GetWicImagingFactory() const { return winrt::get(m_wicFactory); }
+		ID2D1Factory3*				GetD2DFactory() const { return m_d2dFactory.get(); }
+		ID2D1Device2*				GetD2DDevice() const { return m_d2dDevice.get(); }
+		ID2D1DeviceContext2*		GetD2DDeviceContext() const { return m_d2dContext.get(); }
+		ID2D1Bitmap1*				GetD2DTargetBitmap() const { return m_d2dTargetBitmap.get(); }
+		IDWriteFactory3*			GetDWriteFactory() const { return m_dwriteFactory.get(); }
+		IWICImagingFactory*			GetWicImagingFactory() const { return m_wicFactory; }
 		D2D1::Matrix3x2F			GetOrientationTransform2D() const { return m_orientationTransform2D; }
 
 	private:
@@ -76,7 +76,7 @@ namespace DX
 
 		// DirectWrite drawing components.
 		winrt::com_ptr<IDWriteFactory3>		m_dwriteFactory;
-		winrt::com_ptr<IWICImagingFactory2>	m_wicFactory;
+		IWICImagingFactory*					m_wicFactory;
 
 		// Cached reference to the Window.
 		winrt::agile_ref<winrt::Windows::UI::Core::CoreWindow> m_window;
