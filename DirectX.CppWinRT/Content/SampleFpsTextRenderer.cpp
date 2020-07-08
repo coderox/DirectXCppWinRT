@@ -4,7 +4,6 @@
 #include "Common/DirectXHelper.h"
 
 using namespace DirectX_Shared;
-using namespace Microsoft::WRL;
 
 // Initializes D2D resources used for text rendering.
 SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) : 
@@ -24,18 +23,18 @@ SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceRes
 			DWRITE_FONT_STRETCH_NORMAL,
 			32.0f,
 			L"en-US",
-			winrt::put(textFormat)
+			textFormat.put()
 			)
 		);
 
-	DX::As(textFormat,m_textFormat);
+	m_textFormat = textFormat.as<IDWriteTextFormat2>();
 
 	DX::ThrowIfFailed(
 		m_textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR)
 		);
 
 	DX::ThrowIfFailed(
-		m_deviceResources->GetD2DFactory()->CreateDrawingStateBlock(winrt::put(m_stateBlock))
+		m_deviceResources->GetD2DFactory()->CreateDrawingStateBlock(m_stateBlock.put())
 		);
 
 	CreateDeviceDependentResources();
@@ -54,18 +53,18 @@ void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 		m_deviceResources->GetDWriteFactory()->CreateTextLayout(
 			m_text.c_str(),
 			(uint32_t) m_text.length(),
-			winrt::get(m_textFormat),
+			m_textFormat.get(),
 			240.0f, // Max width of the input text.
 			50.0f, // Max height of the input text.
-			winrt::put(textLayout)
+			textLayout.put()
 			)
 		);
 
-	DX::As(textLayout, m_textLayout);
+	m_textLayout = textLayout.as<IDWriteTextLayout3>();
 
 	DX::ThrowIfFailed(
-		m_textLayout->GetMetrics(winrt::put(m_textMetrics))
-		);
+		m_textLayout->GetMetrics(&m_textMetrics)
+	);
 }
 
 // Renders a frame to the screen.
@@ -74,7 +73,7 @@ void SampleFpsTextRenderer::Render()
 	ID2D1DeviceContext* context = m_deviceResources->GetD2DDeviceContext();
 	auto logicalSize = m_deviceResources->GetLogicalSize();
 
-	context->SaveDrawingState(winrt::get(m_stateBlock));
+	context->SaveDrawingState(m_stateBlock.get());
 	context->BeginDraw();
 
 	// Position on the bottom right corner
@@ -91,8 +90,8 @@ void SampleFpsTextRenderer::Render()
 
 	context->DrawTextLayout(
 		D2D1::Point2F(0.f, 0.f),
-		winrt::get(m_textLayout),
-		winrt::get(m_whiteBrush)
+		m_textLayout.get(),
+		m_whiteBrush.get()
 		);
 
 	// Ignore D2DERR_RECREATE_TARGET here. This error indicates that the device
@@ -103,13 +102,13 @@ void SampleFpsTextRenderer::Render()
 		DX::ThrowIfFailed(hr);
 	}
 
-	context->RestoreDrawingState(winrt::get(m_stateBlock));
+	context->RestoreDrawingState(m_stateBlock.get());
 }
 
 void SampleFpsTextRenderer::CreateDeviceDependentResources()
 {
 	DX::ThrowIfFailed(
-		m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), winrt::put(m_whiteBrush))
+		m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_whiteBrush.put())
 		);
 }
 void SampleFpsTextRenderer::ReleaseDeviceDependentResources()

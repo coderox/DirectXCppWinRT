@@ -4,18 +4,11 @@
 #include <future>
 #include "pch.h"
 
-using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Storage;
 using namespace winrt::Windows::Storage::Streams;
 
 namespace DX
 {
-	template <typename From, typename To>
-	void As(From const & from, winrt::com_ptr<To> & to)
-	{
-		to = from.as<To>();
-	}
-
 	inline void ThrowIfFailed(HRESULT hr)
 	{
 		if (FAILED(hr))
@@ -29,12 +22,12 @@ namespace DX
 	{
 		try {
 			auto folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
-			auto file = co_await folder.GetFileAsync(winrt::hstring_ref(filename.c_str()));
+			auto file = co_await folder.GetFileAsync(filename.c_str());
 			IBuffer fileBuffer = co_await FileIO::ReadBufferAsync(file);
 			std::vector<byte> returnBuffer;
 			returnBuffer.resize(fileBuffer.Length());
-			DataReader::FromBuffer(fileBuffer).ReadBytes(winrt::array_ref<byte>(returnBuffer));
-			return returnBuffer;
+			DataReader::FromBuffer(fileBuffer).ReadBytes(winrt::array_view<byte>(returnBuffer));
+			co_return returnBuffer;
 		}
 		catch (...) {
 

@@ -6,7 +6,6 @@ using namespace winrt;
 using namespace winrt::Windows::ApplicationModel::Core;
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::UI::Composition;
-using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Foundation::Collections;
 
 WINRT_EXPORT namespace DirectX_CppWinRT {
@@ -18,11 +17,11 @@ WINRT_EXPORT namespace DirectX_CppWinRT {
 			return *this;
 		}
 
-		void Initialize(CoreApplicationView const &)
+		void Initialize(CoreApplicationView const&)
 		{
 		}
 
-		void Load(hstring_ref)
+		void Load(hstring)
 		{
 		}
 
@@ -89,5 +88,5 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 	{
 		winrt::make<DirectX_CppWinRT::App>();
 	});*/
-	CoreApplication::Run(DirectX_CppWinRT::App());
+	CoreApplication::Run(winrt::make<DirectX_CppWinRT::App>());
 }
