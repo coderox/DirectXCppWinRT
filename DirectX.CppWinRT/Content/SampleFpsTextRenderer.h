@@ -14,7 +14,7 @@ namespace DirectX_Shared
 		void CreateDeviceDependentResources();
 		void ReleaseDeviceDependentResources();
 		void Update(DX::StepTimer const& timer);
-		void Render();
+		void Render() const;
 
 	private:
 		// Cached pointer to device resources.

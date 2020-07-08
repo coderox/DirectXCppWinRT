@@ -12,20 +12,20 @@ WINRT_EXPORT namespace DirectX_CppWinRT {
 
 	struct App : implements<App, IFrameworkViewSource, IFrameworkView>
 	{
-		IFrameworkView CreateView()
+		IFrameworkView CreateView() const
 		{
 			return *this;
 		}
 
-		void Initialize(CoreApplicationView const&)
+		static void Initialize(CoreApplicationView const&)
 		{
 		}
 
-		void Load(hstring)
+		static void Load(hstring)
 		{
 		}
 
-		void Uninitialize()
+		static void Uninitialize()
 		{
 		}
 
@@ -40,14 +40,14 @@ WINRT_EXPORT namespace DirectX_CppWinRT {
 
 			if (m_main == nullptr)
 			{
-				m_main = std::unique_ptr<Main>(new Main(m_deviceResources));
+				m_main = std::make_unique<Main>(m_deviceResources);
 			}
 
 			m_windowClosed = false;
 			m_windowVisible = true;
 		}
 
-		void Run()
+		void Run() const
 		{
 			while (!m_windowClosed)
 			{
@@ -73,8 +73,8 @@ WINRT_EXPORT namespace DirectX_CppWinRT {
 
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
 		std::unique_ptr<Main> m_main;
-		bool m_windowClosed;
-		bool m_windowVisible;
+		bool m_windowClosed = false;
+		bool m_windowVisible = false;
 
 		CoreWindow::Activated_revoker m_activated;
 		CompositionTarget m_target{ nullptr };
@@ -84,9 +84,6 @@ WINRT_EXPORT namespace DirectX_CppWinRT {
 
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
-	/*Application::Start([](auto &&)
-	{
-		winrt::make<DirectX_CppWinRT::App>();
-	});*/
 	CoreApplication::Run(winrt::make<DirectX_CppWinRT::App>());
+	return 0;
 }

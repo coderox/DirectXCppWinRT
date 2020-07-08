@@ -16,11 +16,11 @@ namespace DirectX_Shared
 		void CreateWindowSizeDependentResources();
 		void ReleaseDeviceDependentResources();
 		void Update(DX::StepTimer const& timer);
-		void Render();
+		void Render() const;
 		void StartTracking();
 		void TrackingUpdate(float positionX);
 		void StopTracking();
-		bool IsTracking() { return m_tracking; }
+		bool IsTracking() const { return m_tracking; }
 
 	private:
 		void Rotate(float radians);

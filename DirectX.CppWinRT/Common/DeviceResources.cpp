@@ -98,7 +98,7 @@ void DX::DeviceResources::CreateDeviceIndependentResources()
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory3),
 			&options,
-			(void**)m_d2dFactory.put()
+			reinterpret_cast<void**>(m_d2dFactory.put())
 		)
 	);
 
@@ -107,7 +107,7 @@ void DX::DeviceResources::CreateDeviceIndependentResources()
 		DWriteCreateFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory3),
-			(::IUnknown**)m_dwriteFactory.put()
+			reinterpret_cast<::IUnknown**>(m_dwriteFactory.put())
 		)
 	);
 
@@ -158,10 +158,10 @@ void DX::DeviceResources::CreateDeviceResources()
 	winrt::com_ptr<ID3D11Device> device;
 	winrt::com_ptr<ID3D11DeviceContext> context;
 
-	HRESULT hr = D3D11CreateDevice(
+	const HRESULT hr = D3D11CreateDevice(
 		nullptr,					// Specify nullptr to use the default adapter.
 		D3D_DRIVER_TYPE_HARDWARE,	// Create a device using the hardware graphics driver.
-		0,							// Should be 0 unless the driver is D3D_DRIVER_TYPE_SOFTWARE.
+		nullptr,					// Should be 0 unless the driver is D3D_DRIVER_TYPE_SOFTWARE.
 		creationFlags,				// Set debug and Direct2D compatibility flags.
 		featureLevels,				// List of feature levels this app can support.
 		ARRAYSIZE(featureLevels),	// Size of the list above.
@@ -180,7 +180,7 @@ void DX::DeviceResources::CreateDeviceResources()
 			D3D11CreateDevice(
 				nullptr,
 				D3D_DRIVER_TYPE_WARP, // Create a WARP device instead of a hardware device.
-				0,
+				nullptr,
 				creationFlags,
 				featureLevels,
 				ARRAYSIZE(featureLevels),
@@ -197,7 +197,7 @@ void DX::DeviceResources::CreateDeviceResources()
 	m_d3dContext = context.as<ID3D11DeviceContext3>();
 
 	// Create the Direct2D device object and a corresponding context.
-	auto dxgiDevice = m_d3dDevice.as<IDXGIDevice3>();
+	const auto dxgiDevice = m_d3dDevice.as<IDXGIDevice3>();
 	
 	DX::ThrowIfFailed(
 		m_d2dFactory->CreateDevice(dxgiDevice.get(), m_d2dDevice.put())
@@ -228,16 +228,16 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 	// The width and height of the swap chain must be based on the window's
 	// natively-oriented width and height. If the window is not in the native
 	// orientation, the dimensions must be reversed.
-	DXGI_MODE_ROTATION displayRotation = ComputeDisplayRotation();
+	const DXGI_MODE_ROTATION displayRotation = ComputeDisplayRotation();
 
-	bool swapDimensions = displayRotation == DXGI_MODE_ROTATION_ROTATE90 || displayRotation == DXGI_MODE_ROTATION_ROTATE270;
+	const bool swapDimensions = displayRotation == DXGI_MODE_ROTATION_ROTATE90 || displayRotation == DXGI_MODE_ROTATION_ROTATE270;
 	m_d3dRenderTargetSize.Width = swapDimensions ? m_outputSize.Height : m_outputSize.Width;
 	m_d3dRenderTargetSize.Height = swapDimensions ? m_outputSize.Width : m_outputSize.Height;
 
 	if (m_swapChain.get() != nullptr)
 	{
 		// If the swap chain already exists, resize it.
-		HRESULT hr = m_swapChain->ResizeBuffers(
+		const HRESULT hr = m_swapChain->ResizeBuffers(
 			2, // Double-buffered swap chain.
 			lround(m_d3dRenderTargetSize.Width),
 			lround(m_d3dRenderTargetSize.Height),
@@ -262,8 +262,8 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 	else
 	{
 		// Otherwise, create a new one using the same adapter as the existing Direct3D device.
-		DXGI_SCALING scaling = DisplayMetrics::SupportHighResolutions ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
-		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
+		const DXGI_SCALING scaling = DisplayMetrics::SupportHighResolutions ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 
 		swapChainDesc.Width = lround(m_d3dRenderTargetSize.Width);		// Match the size of the window.
 		swapChainDesc.Height = lround(m_d3dRenderTargetSize.Height);
@@ -468,7 +468,7 @@ void DX::DeviceResources::UpdateRenderTargetSize()
 // This method is called when the CoreWindow is created (or re-created).
 void DX::DeviceResources::SetWindow(CoreWindow const& window)
 {
-	DisplayInformation currentDisplayInformation = DisplayInformation::GetForCurrentView();
+	const DisplayInformation currentDisplayInformation = DisplayInformation::GetForCurrentView();
 
 	m_window = window;
 	m_logicalSize = winrt::Windows::Foundation::Size(window.Bounds().Width, window.Bounds().Height);
@@ -594,7 +594,7 @@ void DX::DeviceResources::RegisterDeviceNotify(DX::IDeviceNotify* deviceNotify)
 
 // Call this method when the app suspends. It provides a hint to the driver that the app 
 // is entering an idle state and that temporary buffers can be reclaimed for use by other apps.
-void DX::DeviceResources::Trim()
+void DX::DeviceResources::Trim() const
 {
 	auto dxgiDevice = m_d3dDevice.as<IDXGIDevice3>();
 
@@ -608,7 +608,7 @@ void DX::DeviceResources::Present()
 	// to sleep until the next VSync. This ensures we don't waste any cycles rendering
 	// frames that will never be displayed to the screen.
 	DXGI_PRESENT_PARAMETERS parameters = { 0 };
-	HRESULT hr = m_swapChain->Present1(1, 0, &parameters);
+	const HRESULT hr = m_swapChain->Present1(1, 0, &parameters);
 
 	// Discard the contents of the render target.
 	// This is a valid operation only when the existing contents will be entirely
@@ -632,7 +632,7 @@ void DX::DeviceResources::Present()
 
 // This method determines the rotation between the display device's native orientation and the
 // current display orientation.
-DXGI_MODE_ROTATION DX::DeviceResources::ComputeDisplayRotation()
+DXGI_MODE_ROTATION DX::DeviceResources::ComputeDisplayRotation() const
 {
 	DXGI_MODE_ROTATION rotation = DXGI_MODE_ROTATION_UNSPECIFIED;
 
@@ -640,47 +640,53 @@ DXGI_MODE_ROTATION DX::DeviceResources::ComputeDisplayRotation()
 	// the DisplayOrientations enum has other values.
 	switch (m_nativeOrientation)
 	{
-	case DisplayOrientations::Landscape:
-		switch (m_currentOrientation)
-		{
 		case DisplayOrientations::Landscape:
-			rotation = DXGI_MODE_ROTATION_IDENTITY;
+			switch (m_currentOrientation)
+			{
+				case DisplayOrientations::Landscape:
+					rotation = DXGI_MODE_ROTATION_IDENTITY;
+					break;
+
+				case DisplayOrientations::Portrait:
+					rotation = DXGI_MODE_ROTATION_ROTATE270;
+					break;
+
+				case DisplayOrientations::LandscapeFlipped:
+					rotation = DXGI_MODE_ROTATION_ROTATE180;
+					break;
+
+				case DisplayOrientations::PortraitFlipped:
+					rotation = DXGI_MODE_ROTATION_ROTATE90;
+					break;
+				default:
+					break;
+			}
 			break;
 
 		case DisplayOrientations::Portrait:
-			rotation = DXGI_MODE_ROTATION_ROTATE270;
-			break;
+			switch (m_currentOrientation)
+				{
+				case DisplayOrientations::Landscape:
+					rotation = DXGI_MODE_ROTATION_ROTATE90;
+					break;
 
-		case DisplayOrientations::LandscapeFlipped:
-			rotation = DXGI_MODE_ROTATION_ROTATE180;
-			break;
+				case DisplayOrientations::Portrait:
+					rotation = DXGI_MODE_ROTATION_IDENTITY;
+					break;
 
-		case DisplayOrientations::PortraitFlipped:
-			rotation = DXGI_MODE_ROTATION_ROTATE90;
-			break;
-		}
-		break;
+				case DisplayOrientations::LandscapeFlipped:
+					rotation = DXGI_MODE_ROTATION_ROTATE270;
+					break;
 
-	case DisplayOrientations::Portrait:
-		switch (m_currentOrientation)
-		{
-		case DisplayOrientations::Landscape:
-			rotation = DXGI_MODE_ROTATION_ROTATE90;
+				case DisplayOrientations::PortraitFlipped:
+					rotation = DXGI_MODE_ROTATION_ROTATE180;
+					break;
+				default:
+					break;
+			}
 			break;
-
-		case DisplayOrientations::Portrait:
-			rotation = DXGI_MODE_ROTATION_IDENTITY;
+		default:
 			break;
-
-		case DisplayOrientations::LandscapeFlipped:
-			rotation = DXGI_MODE_ROTATION_ROTATE270;
-			break;
-
-		case DisplayOrientations::PortraitFlipped:
-			rotation = DXGI_MODE_ROTATION_ROTATE180;
-			break;
-		}
-		break;
 	}
 	return rotation;
 }

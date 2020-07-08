@@ -45,10 +45,10 @@ namespace DX
 	// Check for SDK Layer support.
 	inline bool SdkLayersAvailable()
 	{
-		HRESULT hr = D3D11CreateDevice(
+		const HRESULT hr = D3D11CreateDevice(
 			nullptr,
 			D3D_DRIVER_TYPE_NULL,       // There is no need to create a real hardware device.
-			0,
+			nullptr,
 			D3D11_CREATE_DEVICE_DEBUG,  // Check for the SDK layers.
 			nullptr,                    // Any feature level will do.
 			0,

@@ -13,9 +13,9 @@ Main::Main(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_deviceResources->RegisterDeviceNotify(this);
 
 	// TODO: Replace this with your app's content initialization.
-	m_sceneRenderer = std::unique_ptr<Sample3DSceneRenderer>(new Sample3DSceneRenderer(m_deviceResources));
+	m_sceneRenderer = std::make_unique<Sample3DSceneRenderer>(m_deviceResources);
 	
-	m_fpsTextRenderer = std::unique_ptr<SampleFpsTextRenderer>(new SampleFpsTextRenderer(m_deviceResources));
+	m_fpsTextRenderer = std::make_unique<SampleFpsTextRenderer>(m_deviceResources);
 
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
@@ -52,7 +52,7 @@ void Main::Update()
 
 // Renders the current frame according to the current application state.
 // Returns true if the frame was rendered and is ready to be displayed.
-bool Main::Render()
+bool Main::Render() const
 {
 	// Don't try to render anything before the first Update.
 	if (m_timer.GetFrameCount() == 0)

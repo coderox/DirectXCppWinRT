@@ -9,11 +9,11 @@ using namespace DirectX;
 
 // Loads vertex and pixel shaders from files and instantiates the cube geometry.
 Sample3DSceneRenderer::Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
+	m_deviceResources(deviceResources),
+	m_indexCount(0),
 	m_loadingComplete(false),
 	m_degreesPerSecond(45),
-	m_indexCount(0),
-	m_tracking(false),
-	m_deviceResources(deviceResources)
+	m_tracking(false)
 {
 	CreateDeviceDependentResourcesAsync();
 	CreateWindowSizeDependentResources();
@@ -22,9 +22,9 @@ Sample3DSceneRenderer::Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceRes
 // Initializes view parameters when the window size changes.
 void Sample3DSceneRenderer::CreateWindowSizeDependentResources()
 {
-	auto outputSize = m_deviceResources->GetOutputSize();
-	float aspectRatio = outputSize.Width / outputSize.Height;
-	float fovAngleY = 70.0f * XM_PI / 180.0f;
+	const auto outputSize = m_deviceResources->GetOutputSize();
+	const float aspectRatio = outputSize.Width / outputSize.Height;
+	auto fovAngleY = 70.0f * XM_PI / 180.0f;
 
 	// This is a simple example of change that can be made when the app is in
 	// portrait or snapped view.
@@ -40,16 +40,16 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources()
 	// this transform should not be applied.
 
 	// This sample makes use of a right-handed coordinate system using row-major matrices.
-	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovRH(
+	const XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovRH(
 		fovAngleY,
 		aspectRatio,
 		0.01f,
 		100.0f
 		);
 
-	XMFLOAT4X4 orientation = m_deviceResources->GetOrientationTransform3D();
+	auto orientation = m_deviceResources->GetOrientationTransform3D();
 
-	XMMATRIX orientationMatrix = XMLoadFloat4x4(&orientation);
+	const auto orientationMatrix = XMLoadFloat4x4(&orientation);
 
 	XMStoreFloat4x4(
 		&m_constantBufferData.projection,
@@ -70,9 +70,9 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 	if (!m_tracking)
 	{
 		// Convert degrees to radians, then convert seconds to rotation angle
-		float radiansPerSecond = XMConvertToRadians(m_degreesPerSecond);
-		double totalRotation = timer.GetTotalSeconds() * radiansPerSecond;
-		float radians = static_cast<float>(fmod(totalRotation, XM_2PI));
+		const float radiansPerSecond = XMConvertToRadians(m_degreesPerSecond);
+		const double totalRotation = timer.GetTotalSeconds() * radiansPerSecond;
+		const float radians = static_cast<float>(fmod(totalRotation, XM_2PI));
 
 		Rotate(radians);
 	}
@@ -95,7 +95,7 @@ void Sample3DSceneRenderer::TrackingUpdate(float positionX)
 {
 	if (m_tracking)
 	{
-		float radians = XM_2PI * 2.0f * positionX / m_deviceResources->GetOutputSize().Width;
+		const float radians = XM_2PI * 2.0f * positionX / m_deviceResources->GetOutputSize().Width;
 		Rotate(radians);
 	}
 }
@@ -106,7 +106,7 @@ void Sample3DSceneRenderer::StopTracking()
 }
 
 // Renders one frame using the vertex and pixel shaders.
-void Sample3DSceneRenderer::Render()
+void Sample3DSceneRenderer::Render() const
 {
 	// Loading is asynchronous. Only draw geometry after it's loaded.
 	if (!m_loadingComplete)
@@ -120,7 +120,7 @@ void Sample3DSceneRenderer::Render()
 	context->UpdateSubresource1(
 		m_constantBuffer.get(),
 		0,
-		NULL,
+		nullptr,
 		&m_constantBufferData,
 		0,
 		0,
@@ -241,7 +241,7 @@ void Sample3DSceneRenderer::CreateCube() {
 		{ XMFLOAT3(0.5f,  0.5f,  0.5f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
 	};
 
-	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
+	D3D11_SUBRESOURCE_DATA vertexBufferData;
 	vertexBufferData.pSysMem = cubeVertices;
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
@@ -283,7 +283,7 @@ void Sample3DSceneRenderer::CreateCube() {
 
 	m_indexCount = ARRAYSIZE(cubeIndices);
 
-	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
+	D3D11_SUBRESOURCE_DATA indexBufferData;
 	indexBufferData.pSysMem = cubeIndices;
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;
@@ -300,8 +300,8 @@ void Sample3DSceneRenderer::CreateCube() {
 concurrency::task<void> Sample3DSceneRenderer::CreateDeviceDependentResourcesAsync()
 {
 	// Load shaders asynchronously.
-	auto vsFileData = co_await DX::ReadDataAsync(L"SampleVertexShader.cso");
-	auto psFileData = co_await DX::ReadDataAsync(L"SamplePixelShader.cso");
+	const auto vsFileData = co_await DX::ReadDataAsync(L"SampleVertexShader.cso");
+	const auto psFileData = co_await DX::ReadDataAsync(L"SamplePixelShader.cso");
 
 	LoadVertexShader(vsFileData);
 	LoadPixelShader(psFileData);

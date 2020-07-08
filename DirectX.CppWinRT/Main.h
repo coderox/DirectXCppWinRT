@@ -12,14 +12,14 @@ namespace DirectX_CppWinRT
 	{
 	public:
 		Main(const std::shared_ptr<DX::DeviceResources>& deviceResources);
-		~Main();
+		virtual ~Main();
 		void CreateWindowSizeDependentResources();
 		void Update();
-		bool Render();
+		bool Render() const;
 
 		// IDeviceNotify
-		virtual void OnDeviceLost();
-		virtual void OnDeviceRestored();
+		void OnDeviceLost() override;
+		void OnDeviceRestored() override;
 
 	private:
 		// Cached pointer to device resources.

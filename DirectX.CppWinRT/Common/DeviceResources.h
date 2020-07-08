@@ -6,6 +6,7 @@ namespace DX
 	// Provides an interface for an application that owns DeviceResources to be notified of the device being lost or created.
 	interface IDeviceNotify
 	{
+		virtual ~IDeviceNotify() = default;
 		virtual void OnDeviceLost() = 0;
 		virtual void OnDeviceRestored() = 0;
 	};
@@ -22,7 +23,7 @@ namespace DX
 		void ValidateDevice();
 		void HandleDeviceLost();
 		void RegisterDeviceNotify(IDeviceNotify* deviceNotify);
-		void Trim();
+		void Trim() const;
 		void Present();
 
 		// The size of the render target, in pixels.
@@ -56,7 +57,7 @@ namespace DX
 		void CreateDeviceResources();
 		void CreateWindowSizeDependentResources();
 		void UpdateRenderTargetSize();
-		DXGI_MODE_ROTATION ComputeDisplayRotation();
+		DXGI_MODE_ROTATION ComputeDisplayRotation() const;
 
 		// Direct3D objects.
 		winrt::com_ptr<ID3D11Device3>			m_d3dDevice;

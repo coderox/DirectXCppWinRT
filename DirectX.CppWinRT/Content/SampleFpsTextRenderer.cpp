@@ -7,8 +7,8 @@ using namespace DirectX_Shared;
 
 // Initializes D2D resources used for text rendering.
 SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) : 
-	m_text(L""),
-	m_deviceResources(deviceResources)
+	m_deviceResources(deviceResources),
+	m_text(L"")
 {
 	ZeroMemory(&m_textMetrics, sizeof(DWRITE_TEXT_METRICS));
 
@@ -44,7 +44,7 @@ SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceRes
 void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 {
 	// Update display text.
-	uint32_t fps = timer.GetFramesPerSecond();
+	const uint32_t fps = timer.GetFramesPerSecond();
 
 	m_text = (fps > 0) ? std::to_wstring(fps) + L" FPS" : L" - FPS";
 
@@ -52,7 +52,7 @@ void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 	DX::ThrowIfFailed(
 		m_deviceResources->GetDWriteFactory()->CreateTextLayout(
 			m_text.c_str(),
-			(uint32_t) m_text.length(),
+			static_cast<uint32_t>( m_text.length()),
 			m_textFormat.get(),
 			240.0f, // Max width of the input text.
 			50.0f, // Max height of the input text.
@@ -68,16 +68,16 @@ void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
 }
 
 // Renders a frame to the screen.
-void SampleFpsTextRenderer::Render()
+void SampleFpsTextRenderer::Render() const
 {
 	ID2D1DeviceContext* context = m_deviceResources->GetD2DDeviceContext();
-	auto logicalSize = m_deviceResources->GetLogicalSize();
+	const auto logicalSize = m_deviceResources->GetLogicalSize();
 
 	context->SaveDrawingState(m_stateBlock.get());
 	context->BeginDraw();
 
 	// Position on the bottom right corner
-	D2D1::Matrix3x2F screenTranslation = D2D1::Matrix3x2F::Translation(
+	const D2D1::Matrix3x2F screenTranslation = D2D1::Matrix3x2F::Translation(
 		logicalSize.Width - m_textMetrics.layoutWidth,
 		logicalSize.Height - m_textMetrics.height
 		);
@@ -96,7 +96,7 @@ void SampleFpsTextRenderer::Render()
 
 	// Ignore D2DERR_RECREATE_TARGET here. This error indicates that the device
 	// is lost. It will be handled during the next call to Present.
-	HRESULT hr = context->EndDraw();
+	const HRESULT hr = context->EndDraw();
 	if (hr != D2DERR_RECREATE_TARGET)
 	{
 		DX::ThrowIfFailed(hr);
